@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // ── Palette (Cyber-Orchid Dark Variant) ──────────────────────────────────────
 const C = {
@@ -1202,6 +1203,7 @@ export default function App() {
           <Contact/>
         </main>
         <Footer/>
+        <Analytics />
       </div>
     </>
   );
