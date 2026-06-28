@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
-// ── Palette (Cyber-Orchid Dark Variant - Untouched) ─────────────────────────
+// ── Palette (Cyber-Orchid Dark Variant) ──────────────────────────────────────
 const C = {
   bg: "#0D0812",
   surface: "#150E1C",
@@ -16,74 +16,17 @@ const C = {
   success: "#A8D8A8",
 };
 
-// ── Minimalist Technical SVG Icons (Replacing Emojis) ────────────────────────
-const Icons = {
-  Agentic: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-    </svg>
-  ),
-  RAG: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-      <path d="M14.5 9.5 12 12M12 12l-2.5 2.5M12 12l2.5 2.5M12 12l-2.5-2.5" />
-      <circle cx="12" cy="12" r="1" />
-    </svg>
-  ),
-  GenAI: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-  ),
-  ML: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  ),
-  CV: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  ),
-  Automation: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-    </svg>
-  ),
-  XAI: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-  ),
-  Doc: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" y1="13" x2="8" y2="13" />
-      <line x1="16" y1="17" x2="8" y2="17" />
-      <polyline points="10 9 9 9 8 9" />
-    </svg>
-  )
-};
-
-// ── Technical Symbol Cursor Trail (Replaces Dots) ──────────────────────────
+// ── Custom GPU-Accelerated Cursor Trail ────────────────────────────────────
 function CursorTrail() {
   const mouseRef = useRef({ x: -200, y: -200 });
   const rafRef = useRef(null);
   const containerRef = useRef(null);
-  const COUNT = 16;
-  const traceSymbols = ["•", "◦", "⬡", "{}", "<>", "01", "[]"];
+  const COUNT = 18;
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const items = Array.from(container.children);
+    const dots = Array.from(container.children);
 
     const onMove = e => { 
       mouseRef.current = { x: e.clientX, y: e.clientY }; 
@@ -96,15 +39,17 @@ function CursorTrail() {
       positions[0] = { ...mouseRef.current };
       for (let i = 1; i < COUNT; i++) {
         positions[i] = {
-          x: positions[i].x + (positions[i-1].x - positions[i].x) * 0.25,
-          y: positions[i].y + (positions[i-1].y - positions[i].y) * 0.25,
+          x: positions[i].x + (positions[i-1].x - positions[i].x) * 0.28,
+          y: positions[i].y + (positions[i-1].y - positions[i].y) * 0.28,
         };
       }
       
-      items.forEach((item, i) => {
+      dots.forEach((dot, i) => {
         const progress = 1 - i / COUNT;
-        item.style.transform = `translate3d(${positions[i].x - 4}px, ${positions[i].y - 6}px, 0) scale(${progress})`;
-        item.style.opacity = progress * 0.6;
+        const baseSize = 6;
+        
+        dot.style.transform = `translate3d(${positions[i].x - baseSize / 2}px, ${positions[i].y - baseSize / 2}px, 0) scale(${progress})`;
+        dot.style.opacity = progress * 0.7;
       });
       rafRef.current = requestAnimationFrame(animate);
     }
@@ -123,21 +68,19 @@ function CursorTrail() {
           position: "absolute", 
           top: 0, 
           left: 0, 
-          color: C.accent,
-          fontFamily: "monospace",
-          fontSize: "12px",
-          fontWeight: "bold",
+          width: "6px", 
+          height: "6px", 
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${C.accent}, ${C.accentAlt})`,
           pointerEvents: "none",
           willChange: "transform, opacity"
-        }}>
-          {traceSymbols[i % traceSymbols.length]}
-        </div>
+        }}/>
       ))}
     </div>
   );
 }
 
-// ── Click Tracker Ripple Layer (Preserved Structure) ──────────────────────
+// ── Ripple click effect ───────────────────────────────────────────────────
 function useRipple() {
   const [ripples, setRipples] = useState([]);
   useEffect(() => {
@@ -172,7 +115,7 @@ function RippleLayer() {
   );
 }
 
-// ── Magnetic Wrapper (Preserved Architecture) ─────────────────────────────
+// ── Magnetic button wrapper ───────────────────────────────────────────────
 function Magnetic({ children, strength = 0.35 }) {
   const ref = useRef(null);
   const handleMove = useCallback(e => {
@@ -196,23 +139,20 @@ function Magnetic({ children, strength = 0.35 }) {
   );
 }
 
-// ── AI Halos & Structural Architecture Clusters (Replacing Organic Blobs) ──
-function NeuralHalo({ color, size=300, style={} }) {
+// ── Morphing blob ─────────────────────────────────────────────────────────
+function MorphBlob({ color, size=300, style={} }) {
   return (
     <div style={{
       width:size, height:size, position:"absolute", pointerEvents:"none",
-      background:`radial-gradient(circle at 50% 50%, ${color}1A, ${color}04 55%, transparent 75%)`,
-      border:`1px dashed ${color}0D`,
-      borderRadius:"50%",
-      filter:"blur(40px)",
-      animation:"morphBlob 12s linear infinite",
-      zIndex: 0,
+      background:`radial-gradient(circle at 40% 40%, ${color}22, ${color}08 60%, transparent)`,
+      filter:"blur(60px)",
+      animation:"morphBlob 8s ease-in-out infinite",
       ...style,
     }}/>
   );
 }
 
-// ── Intersection Observer Hooks & Reveal Logic (Preserved Layouts) ──────────
+// ── useInView ─────────────────────────────────────────────────────────────
 function useInView(threshold=0.12) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -227,6 +167,7 @@ function useInView(threshold=0.12) {
   return [ref, visible];
 }
 
+// ── Reveal ────────────────────────────────────────────────────────────────
 function Reveal({ children, delay=0, direction="up", style={} }) {
   const [ref, visible] = useInView();
   const tx = direction==="up"?"translateY(40px)":direction==="left"?"translateX(-40px)":direction==="right"?"translateX(40px)":"scale(0.92)";
@@ -241,7 +182,7 @@ function Reveal({ children, delay=0, direction="up", style={} }) {
   );
 }
 
-// ── Model Execution / Terminal Interface (Hero Text Sequences) ────────────
+// ── Typewriter (RE-INSERTED COMPONENT) ────────────────────────────────────
 function Typewriter({ words, speed=75, pause=1600 }) {
   const [display, setDisplay] = useState("");
   const [wIdx, setWIdx] = useState(0);
@@ -271,6 +212,7 @@ function Typewriter({ words, speed=75, pause=1600 }) {
   );
 }
 
+// ── CountUp ───────────────────────────────────────────────────────────────
 function CountUp({ target, suffix="", duration=1600 }) {
   const [val, setVal] = useState(0);
   const [ref, visible] = useInView();
@@ -289,48 +231,40 @@ function CountUp({ target, suffix="", duration=1600 }) {
   return <span ref={ref}>{val}{suffix}</span>;
 }
 
-// ── Graph Network Inference Pipeline Canvas (Upgraded Neural System) ───────
+// ── Performance-Optimized AI Data Pipeline Canvas ──────────────────────────
 function PipelineCanvas() {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    let W, H, nodes, packets;
+    let W, H, nodes;
     
     function init() {
       W = canvas.width = canvas.offsetWidth;
       H = canvas.height = canvas.offsetHeight;
-      nodes = Array.from({ length: 28 }, () => ({
+      nodes = Array.from({ length: 26 }, () => ({
         x: Math.random() * W,
         y: Math.random() * H,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
         r: Math.random() * 2 + 1.5,
         pulse: Math.random() * Math.PI
-      }));
-      
-      packets = Array.from({ length: 12 }, () => ({
-        from: Math.floor(Math.random() * nodes.length),
-        to: Math.floor(Math.random() * nodes.length),
-        progress: Math.random(),
-        speed: 0.004 + Math.random() * 0.006
       }));
     }
     
     function draw() {
       ctx.clearRect(0, 0, W, H);
       
-      // Compute Neural Connectivity Vector Weights
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
           const dy = nodes[i].y - nodes[j].y;
           const d = Math.sqrt(dx * dx + dy * dy);
-          if (d < 130) {
+          if (d < 110) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(192, 132, 212, ${(1 - d / 130) * 0.10})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(192, 132, 212, ${(1 - d / 110) * 0.12})`;
+            ctx.lineWidth = 0.6;
             ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.stroke();
@@ -338,39 +272,15 @@ function PipelineCanvas() {
         }
       }
       
-      // Render active computation messages traveling across infrastructure paths
-      packets.forEach(p => {
-        p.progress += p.speed;
-        if (p.progress >= 1) {
-          p.from = p.to;
-          p.to = Math.floor(Math.random() * nodes.length);
-          p.progress = 0;
-        }
-        const nFrom = nodes[p.from];
-        const nTo = nodes[p.to];
-        if (nFrom && nTo) {
-          const x = nFrom.x + (nTo.x - nFrom.x) * p.progress;
-          const y = nFrom.y + (nTo.y - nFrom.y) * p.progress;
-          ctx.beginPath();
-          ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = C.accent;
-          ctx.shadowBlur = 4;
-          ctx.shadowColor = C.accent;
-          ctx.fill();
-          ctx.shadowBlur = 0; // Reset canvas state
-        }
-      });
-      
-      // Drawing Neural Activation Nodes
       nodes.forEach((n, i) => {
         n.x += n.vx; n.y += n.vy;
-        n.pulse += 0.008;
+        n.pulse += 0.01;
         if (n.x < 0 || n.x > W) n.vx *= -1;
         if (n.y < 0 || n.y > H) n.vy *= -1;
         
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r * (Math.sin(n.pulse) * 0.15 + 1), 0, Math.PI * 2);
-        ctx.fillStyle = i % 2 === 0 ? `${C.accent}BB` : `${C.accentAlt}BB`;
+        ctx.arc(n.x, n.y, n.r * (Math.sin(n.pulse) * 0.2 + 1), 0, Math.PI * 2);
+        ctx.fillStyle = i % 2 === 0 ? `${C.accent}CC` : `${C.accentAlt}CC`;
         ctx.fill();
       });
       
@@ -381,69 +291,55 @@ function PipelineCanvas() {
     const ro = new ResizeObserver(init); ro.observe(canvas);
     return () => { cancelAnimationFrame(rafRef.current); ro.disconnect(); };
   }, []);
-  return <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.75, pointerEvents: "none", zIndex: 0 }} />;
+  return <canvas ref={canvasRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.85, pointerEvents: "none" }} />;
 }
 
-// ── Grid Architecture Layout Mapping (Unchanged Styling Matrix) ────────────
+// ── Animated grid lines (background) ─────────────────────────────────────
 function GridLines() {
   return (
     <div style={{
       position:"absolute",inset:0,pointerEvents:"none",overflow:"hidden",
-      backgroundImage:`linear-gradient(${C.accent}05 1px, transparent 1px), linear-gradient(90deg, ${C.accent}05 1px, transparent 1px)`,
+      backgroundImage:`linear-gradient(${C.accent}08 1px, transparent 1px), linear-gradient(90deg, ${C.accent}08 1px, transparent 1px)`,
       backgroundSize:"60px 60px",
       animation:"gridPulse 6s ease-in-out infinite",
       maskImage:"radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%)",
-      zIndex: 0
     }}/>
   );
 }
 
-// ── Background Token Streams (Replacing Glitter Matrix) ────────────────────
-function TechnicalBackgroundTokens() {
-  const fragments = useMemo(() => [
-    "AI", "ML", "LLM", "GPT", "RAG", "NLP", "CV", "GPU", "SQL", "JSON", "API", "PY", "<>", "{}", "[]", "1010", "0101"
-  ], []);
-
-  const dataTokens = useMemo(() => Array.from({length: 18}, (_, i) => ({
-    id: i,
-    text: fragments[i % fragments.length],
-    x: Math.random() * 92,
-    y: Math.random() * 92,
-    size: Math.floor(Math.random() * 7) + 11, // 11px - 17px ranges
-    blur: Math.random() > 0.6 ? 1 : 0,
-    dur: Math.random() * 6 + 7,
-    delay: Math.random() * -5,
-  })), [fragments]);
-
+// ── Glitter particles ─────────────────────────────────────────────────────
+function Glitter() {
+  const particles = useMemo(() => Array.from({length:20},(_,i)=>({
+    id:i, x:Math.random()*100, y:Math.random()*100,
+    size:Math.random()*3+1,
+    dur:Math.random()*4+2,
+    delay:Math.random()*4,
+    color:[C.accent,C.accentAlt,"#FFD6E8","#E8C99A"][Math.floor(Math.random()*4)],
+  })),[]);
   return (
-    <div style={{position:"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0}}>
-      {dataTokens.map(t => (
-        <div key={t.id} style={{
-          position:"absolute", left:`${t.x}%`, top:`${t.y}%`,
-          fontSize:t.size,
-          fontFamily:"monospace",
-          fontWeight:600,
-          color:C.secondary,
-          opacity: 0.08,
-          filter: t.blur ? `blur(${t.blur}px)` : "none",
-          willChange: "transform, opacity",
-          animation:`glitter ${t.dur}s ease-in-out ${t.delay}s infinite`,
-          userSelect: "none"
-        }}>
-          {t.text}
-        </div>
+    <div style={{position:"absolute",inset:0,pointerEvents:"none",overflow:"hidden"}}>
+      {particles.map(p=>(
+        <div key={p.id} style={{
+          position:"absolute", left:`${p.x}%`, top:`${p.y}%`,
+          width:p.size, height:p.size, borderRadius:"50%",
+          background:p.color,
+          willChange: "opacity",
+          animation:`glitter ${p.dur}s ease-in-out ${p.delay}s infinite`,
+          border: `1px solid ${p.color}40`
+        }}/>
       ))}
     </div>
   );
 }
 
-// ── Shared Visual Context Variables (Unchanged Structural Styles) ──────────
+// ── Shared UI Styles ──────────────────────────────────────────────────────
 const gs = {
   fontFamily: "'Inter', system-ui, sans-serif",
   color: C.primary,
   bg: C.bg,
 };
 
+// Layout Boundaries Matrix: Unified Left-Align Grid System
 const layoutStyle = {
   maxWidth: "1200px",
   margin: "0 auto",
@@ -475,7 +371,7 @@ function SectionLabel({children}) {
         WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
         fontSize:11,fontWeight:700,letterSpacing:"0.14em",
         textTransform:"uppercase",fontFamily:"'Inter',sans-serif",
-      }} Appending-Data>{children}</span>
+      }}>{children}</span>
     </div>
   );
 }
@@ -490,6 +386,7 @@ function SectionHeading({children}) {
   }}>{children}</h2>;
 }
 
+// Left alignment bounding card matrix container
 function Card({children,style={},glowColor,onClick}) {
   const [hov,setHov]=useState(false);
   const gc=glowColor||C.accent;
@@ -506,7 +403,6 @@ function Card({children,style={},glowColor,onClick}) {
         transform:hov?"translateY(-5px) scale(1.015)":"none",
         cursor:onClick?"pointer":"default",
         textAlign:"left",
-        position: "relative",
         ...style,
       }}
     >{children}</div>
@@ -558,7 +454,7 @@ function Btn({children,primary,onClick,href,target}) {
     : <button onClick={onClick} {...props}>{children}</button>;
 }
 
-// ── Global System Navigation Matrix ───────────────────────────────────────
+// ── Navigation ────────────────────────────────────────────────────────────────
 const NAV_ITEMS=["Home","About","Skills","Projects","Research","Experience","Contact"];
 function Nav() {
   const [scrolled,setScrolled]=useState(false);
@@ -668,7 +564,7 @@ function Nav() {
   );
 }
 
-// ── Hero Runtime Shell ────────────────────────────────────────────────────
+// ── Hero ──────────────────────────────────────────────────────────────────────
 function Hero() {
   const [mounted,setMounted]=useState(false);
   useEffect(()=>{const t=setTimeout(()=>setMounted(true),80);return()=>clearTimeout(t);},[]);
@@ -688,11 +584,11 @@ function Hero() {
     }}>
       <PipelineCanvas />
       <GridLines />
-      <TechnicalBackgroundTokens />
+      <Glitter />
 
-      <NeuralHalo color={C.accentAlt} size={500} style={{top:"5%",left:"-10%",animationDelay:"0s"}}/>
-      <NeuralHalo color={C.accent} size={350} style={{top:"55%",right:"-5%",animationDelay:"3s"}}/>
-      <NeuralHalo color="#C084D4" size={250} style={{bottom:"10%",left:"30%",animationDelay:"1.5s"}}/>
+      <MorphBlob color={C.accentAlt} size={500} style={{top:"5%",left:"-10%",animationDelay:"0s"}}/>
+      <MorphBlob color={C.accent} size={350} style={{top:"55%",right:"-5%",animationDelay:"3s"}}/>
+      <MorphBlob color="#C084D4" size={250} style={{bottom:"10%",left:"30%",animationDelay:"1.5s"}}/>
 
       <div style={layoutStyle}>
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:32,...fadeIn(100),justifyContent:"flex-start"}}>
@@ -707,6 +603,7 @@ function Hero() {
           ))}
         </div>
 
+        {/* Text-gradient clip applied directly inside separate split loop sequences to ensure visible rendering */}
         <div style={fadeIn(350)}>
           <h1 style={{
             fontFamily:"'Space Grotesk',sans-serif",
@@ -779,7 +676,7 @@ function Hero() {
             }}/>
           </div>
           <span style={{fontSize:11,color:C.secondary,fontFamily:"'Inter',sans-serif",letterSpacing:"0.1em",textTransform:"uppercase",animation:"fadeUpDown 2s ease-in-out infinite"}}>
-            SCROLL TO LOAD SYSTEM
+            Scroll to explore
           </span>
         </div>
       </div>
@@ -787,20 +684,20 @@ function Hero() {
   );
 }
 
-// ── About Module ──────────────────────────────────────────────────────────
+// ── About ─────────────────────────────────────────────────────────────────
 function About() {
   const expertise=[
-    {icon: Icons.Agentic,label:"Agentic AI",desc:"Multi-agent systems with autonomous decision loops"},
-    {icon: Icons.RAG,label:"RAG Systems",desc:"Hybrid retrieval with semantic + keyword search"},
-    {icon: Icons.GenAI,label:"Generative AI",desc:"GPT-4o, LangChain, prompt engineering at scale"},
-    {icon: Icons.ML,label:"Machine Learning",desc:"Scikit-learn, TensorFlow, deep learning pipelines"},
-    {icon: Icons.CV,label:"Computer Vision",desc:"OpenCV, MediaPipe, FaceNet, pose estimation"},
-    {icon: Icons.Automation,label:"AI Automation",desc:"n8n workflows, chatbots, intelligent pipelines"},
-    {icon: Icons.XAI,label:"Explainable AI",desc:"SHAP, feature attribution, model interpretability"},
+    {icon:"🧠",label:"Agentic AI",desc:"Multi-agent systems with autonomous decision loops"},
+    {icon:"📚",label:"RAG Systems",desc:"Hybrid retrieval with semantic + keyword search"},
+    {icon:"✨",label:"Generative AI",desc:"GPT-4o, LangChain, prompt engineering at scale"},
+    {icon:"🔬",label:"Machine Learning",desc:"Scikit-learn, TensorFlow, deep learning pipelines"},
+    {icon:"👁",label:"Computer Vision",desc:"OpenCV, MediaPipe, FaceNet, pose estimation"},
+    {icon:"🤖",label:"AI Automation",desc:"n8n workflows, chatbots, intelligent pipelines"},
+    {icon:"🔍",label:"Explainable AI",desc:"SHAP, feature attribution, model interpretability"},
   ];
   return (
     <section id="about" style={{padding:"120px clamp(20px,5vw,80px)",borderTop:`1px solid ${C.border}`,overflow:"hidden",position:"relative"}}>
-      <NeuralHalo color={C.accent} size={400} style={{top:"-10%",right:"-5%",animationDelay:"2s"}}/>
+      <MorphBlob color={C.accent} size={400} style={{top:"-10%",right:"-5%",animationDelay:"2s"}}/>
       <div style={layoutStyle}>
         <Reveal><SectionLabel>About</SectionLabel></Reveal>
         <div className="about-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:72,alignItems:"start",width:"100%"}}>
@@ -824,9 +721,9 @@ function About() {
               <Reveal key={e.label} delay={i*70} direction={i%2===0?"left":"right"}>
                 <Card style={{padding:"18px 20px"}}>
                   <div style={{
-                    color: C.accentAlt, marginBottom:10,display:"inline-block",
+                    fontSize:22,marginBottom:8,display:"inline-block",
                     animation:`float 3s ease-in-out ${i*400}ms infinite`,
-                  }}><e.icon /></div>
+                  }}>{e.icon}</div>
                   <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:13,color:C.primary,marginBottom:4}}>{e.label}</div>
                   <div style={{fontSize:12,color:C.secondary,lineHeight:1.6,fontFamily:"'Inter',sans-serif"}}>{e.desc}</div>
                 </Card>
@@ -838,8 +735,10 @@ function About() {
     </section>
   );
 }
+// ─────────────────────────────────────────────────────────────
+// Skill Pill Component
+// ─────────────────────────────────────────────────────────────
 
-// ── Skills / Capability Pills ─────────────────────────────────────────────
 function SkillPill({ label, delay = 0 }) {
   const [hover, setHover] = useState(false);
 
@@ -871,8 +770,9 @@ function SkillPill({ label, delay = 0 }) {
   );
 }
 
+// ── Skills ────────────────────────────────────────────────────────────────
 const SKILLS=[
-  {category:"Programming",          items:["Python","SQL","Git"]},
+  {category:"Programming",           items:["Python","SQL","Git"]},
   {category:"AI & Machine Learning", items:["TensorFlow","Keras","Scikit-learn","NLP","Computer Vision","Deep Learning","Generative AI","Agentic AI","RAG"]},
   {category:"Frameworks",            items:["LangChain","LangGraph","Streamlit","OpenCV","MediaPipe"]},
   {category:"Databases",             items:["SQLite","ChromaDB","Firebase"]},
@@ -886,8 +786,8 @@ function Skills() {
       background:`linear-gradient(180deg,${C.surface2}70 0%,transparent 100%)`,
       position:"relative",overflow:"hidden",
     }}>
-      <TechnicalBackgroundTokens />
-      <NeuralHalo color={C.accentAlt} size={450} style={{bottom:"-10%",right:"-10%",animationDelay:"1s"}}/>
+      <Glitter/>
+      <MorphBlob color={C.accentAlt} size={450} style={{bottom:"-10%",right:"-10%",animationDelay:"1s"}}/>
       <div style={layoutStyle}>
         <Reveal><SectionLabel>Skills</SectionLabel></Reveal>
         <Reveal delay={100}><SectionHeading>Technical Expertise</SectionHeading></Reveal>
@@ -918,7 +818,7 @@ function Skills() {
   );
 }
 
-// ── Production Pipeline Projects ──────────────────────────────────────────
+// ── Projects ──────────────────────────────────────────────────────────────
 const PROJECTS=[
   {
     featured: true,
@@ -1080,7 +980,7 @@ function ProjectCard({p,index}) {
 function Projects() {
   return (
     <section id="projects" style={{padding:"120px clamp(20px,5vw,80px)",borderTop:`1px solid ${C.border}`,position:"relative",overflow:"hidden"}}>
-      <NeuralHalo color={C.accent} size={400} style={{bottom:"5%",left:"-5%",animationDelay:"4s"}}/>
+      <MorphBlob color={C.accent} size={400} style={{bottom:"5%",left:"-5%",animationDelay:"4s"}}/>
       <div style={layoutStyle}>
         <Reveal><SectionLabel>Projects</SectionLabel></Reveal>
         <Reveal delay={100}><SectionHeading>Featured Work</SectionHeading></Reveal>
@@ -1097,7 +997,7 @@ function Projects() {
   );
 }
 
-// ── Research Publications Layer ───────────────────────────────────────────
+// ── Research ──────────────────────────────────────────────────────────────
 function Research() {
   const [hov,setHov]=useState(false);
   return (
@@ -1106,8 +1006,8 @@ function Research() {
       background:`linear-gradient(180deg,${C.surface2}60 0%,transparent 100%)`,
       position:"relative",overflow:"hidden",
     }}>
-      <TechnicalBackgroundTokens />
-      <NeuralHalo color={C.accentAlt} size={380} style={{top:"0%",right:"5%",animationDelay:"2.5s"}}/>
+      <Glitter/>
+      <MorphBlob color={C.accentAlt} size={380} style={{top:"0%",right:"5%",animationDelay:"2.5s"}}/>
       <div style={layoutStyle}>
         <Reveal><SectionLabel>Research</SectionLabel></Reveal>
         <Reveal delay={100}><SectionHeading>Publications</SectionHeading></Reveal>
@@ -1142,11 +1042,10 @@ function Research() {
                 background:`linear-gradient(135deg,${C.accent}22,${C.accentAlt}22)`,
                 border:`1px solid ${C.accentAlt}45`,
                 display:"flex",alignItems:"center",justifyContent:"center",
-                color: C.accentAlt,
-                flexShrink:0,
+                fontSize:26,flexShrink:0,
                 animation:"float 4s ease-in-out infinite",
                 boxShadow:`0 0 20px ${C.accentAlt}30`,
-              }}><Icons.Doc /></div>
+              }}>📄</div>
               <div style={{flex:1,minWidth:240,textAlign:"left"}}>
                 <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap",justifyContent:"flex-start"}}>
                   <Tag>Under Review</Tag><Tag color={C.success}>IEEE Journal</Tag>
@@ -1182,11 +1081,11 @@ function Research() {
   );
 }
 
-// ── Experience & Operational Verification ─────────────────────────────────
+// ── Experience ────────────────────────────────────────────────────────────
 function Experience() {
   return (
     <section id="experience" style={{padding:"120px clamp(20px,5vw,80px)",borderTop:`1px solid ${C.border}`,position:"relative",overflow:"hidden"}}>
-      <NeuralHalo color={C.accent} size={350} style={{top:"20%",left:"-8%",animationDelay:"0.5s"}}/>
+      <MorphBlob color={C.accent} size={350} style={{top:"20%",left:"-8%",animationDelay:"0.5s"}}/>
       <div style={layoutStyle}>
         <Reveal><SectionLabel>Experience & Achievements</SectionLabel></Reveal>
         <div className="exp-grid" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:56,alignItems:"start",width:"100%"}}>
@@ -1236,7 +1135,7 @@ function Experience() {
                 {stat:0.907,suffix:"",label:"Context Precision (RAGAS)",color:C.accent,isNum:true},
                 {stat:99.3,suffix:"%",label:"Validation Accuracy",color:C.success,isNum:true},
                 {stat:"IEEE",label:"Research Paper Submitted",color:C.accentAlt,isNum:false},
-                {stat:"01",label:"Highest Marks — Live Project",color:C.gold,isNum:false},
+                {stat:"🥇",label:"Highest Marks — Live Project",color:C.gold,isNum:false},
               ].map((a,i)=>(
                 <Reveal key={a.label} delay={i*90}>
                   <Card style={{textAlign:"left",padding:"26px 18px"}} glowColor={a.color}>
@@ -1264,14 +1163,14 @@ function Experience() {
           </Reveal>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:16,width:"100%"}}>
             {[
-              {title:"IBM Data Analyst Professional Certificate",org:"IBM"},
-              {title:"Classifying and Sourcing Data",org:"IBM"},
-              {title:"Fundamentals of Digital Marketing",org:"Google"},
-              {title:"Generative AI Seminar",org:"2024"},
+              {title:"IBM Data Analyst Professional Certificate",org:"IBM",icon:"🏆"},
+              {title:"Classifying and Sourcing Data",org:"IBM",icon:"📊"},
+              {title:"Fundamentals of Digital Marketing",org:"Google",icon:"🎯"},
+              {title:"Generative AI Seminar",org:"2024",icon:"✨"},
             ].map((cert,i)=>(
               <Reveal key={cert.title} delay={i*90}>
                 <Card style={{padding:"22px 24px",textAlign:"left"}} glowColor={C.accentAlt}>
-                  <div style={{color: C.accentAlt, marginBottom:10,display:"inline-block",animation:`float 3s ease-in-out ${i*600}ms infinite`}}><Icons.Agentic /></div>
+                  <div style={{fontSize:26,marginBottom:10,display:"inline-block",animation:`float 3s ease-in-out ${i*600}ms infinite`}}>{cert.icon}</div>
                   <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:13,fontWeight:600,color:C.primary,marginBottom:4,lineHeight:1.45}}>{cert.title}</div>
                   <GradText style={{fontSize:12,fontWeight:600}}>{cert.org}</GradText>
                 </Card>
@@ -1284,7 +1183,7 @@ function Experience() {
   );
 }
 
-// ── Contact Shell ─────────────────────────────────────────────────────────
+// ── Contact ───────────────────────────────────────────────────────────────
 function Contact() {
   return (
     <section id="contact" style={{
@@ -1292,9 +1191,9 @@ function Contact() {
       background:`linear-gradient(180deg,transparent 0%,${C.surface2}80 100%)`,
       position:"relative",overflow:"hidden",
     }}>
-      <TechnicalBackgroundTokens />
-      <NeuralHalo color={C.accent} size={500} style={{top:"-20%",left:"20%",animationDelay:"1s"}}/>
-      <NeuralHalo color={C.accentAlt} size={300} style={{bottom:"-10%",right:"10%",animationDelay:"3s"}}/>
+      <Glitter/>
+      <MorphBlob color={C.accent} size={500} style={{top:"-20%",left:"20%",animationDelay:"1s"}}/>
+      <MorphBlob color={C.accentAlt} size={300} style={{bottom:"-10%",right:"10%",animationDelay:"3s"}}/>
       <div style={layoutStyle}>
         <Reveal><SectionLabel>Contact</SectionLabel></Reveal>
         <Reveal delay={100}>
@@ -1320,6 +1219,7 @@ function Contact() {
   );
 }
 
+// ── Footer ────────────────────────────────────────────────────────────────
 function Footer() {
   return (
     <footer style={{
@@ -1335,7 +1235,7 @@ function Footer() {
   );
 }
 
-// ── App Orchestration Module Entry ────────────────────────────────────────
+// ── App Configuration Entry ─────────────────────────────────────────────────
 export default function App() {
   return (
     <>
@@ -1350,7 +1250,7 @@ export default function App() {
         ::-webkit-scrollbar-thumb{background:linear-gradient(${C.accent},${C.accentAlt});border-radius:2px;}
 
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-        @keyframes float{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-14px) rotate(3deg);}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
         @keyframes fadeUpDown{0%,100%{opacity:0.5;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
         @keyframes scrollDot{0%{transform:translateY(0);opacity:1}80%{transform:translateY(14px);opacity:0}100%{transform:translateY(0);opacity:0}}
         @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -1359,16 +1259,17 @@ export default function App() {
         @keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
         @keyframes rippleOut{0%{transform:scale(0);opacity:1}100%{transform:scale(1.5);opacity:0}}
         @keyframes morphBlob{
-          0%{border-radius:50%;transform:rotate(0deg) scale(1);}
-          50%{border-radius:45% 55% 40% 60%;transform:rotate(180deg) scale(1.03);}
-          100%{border-radius:50%;transform:rotate(360deg) scale(1);}
+          0%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;transform:rotate(0deg) scale(1);}
+          33%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%;transform:rotate(120deg) scale(1.05);}
+          66%{border-radius:70% 30% 50% 50%/30% 50% 70% 60%;transform:rotate(240deg) scale(0.95);}
+          100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%;transform:rotate(360deg) scale(1);}
         }
-        @keyframes gridPulse{0%,100%{opacity:0.5}50%{opacity:0.85}}
-        @keyframes glitter{0%,100%{opacity:0;transform:scale(0.95)}25%{opacity:1;transform:scale(1)}75%{opacity:0.4;transform:scale(0.98)}}
+        @keyframes gridPulse{0%,100%{opacity:0.6}50%{opacity:1}}
+        @keyframes glitter{0%,100%{opacity:0;transform:scale(0)}25%{opacity:1;transform:scale(1)}75%{opacity:0.5;transform:scale(0.8)}}
         @keyframes letterBounce{0%{opacity:0;transform:translateY(20px) scale(0.8)}60%{transform:translateY(-5px) scale(1.05)}100%{opacity:1;transform:none}}
         @keyframes navDot{from{width:0;opacity:0}to{width:16px;opacity:1}}
         @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:0.5}}
-        @keyframes statGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.2) drop-shadow(0 0 6px currentColor)}}
+        @keyframes statGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3) drop-shadow(0 0 8px currentColor)}}
 
         @media(max-width:768px){.nav-desktop{display:none!important}.nav-burger{display:block!important}}
         @media(max-width:900px){.about-grid,.exp-grid{grid-template-columns:1fr!important;gap:40px!important}}
