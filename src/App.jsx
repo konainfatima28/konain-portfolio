@@ -16,9 +16,8 @@ const C = {
   success: "#A8D8A8",
 };
 
-// ── Custom cursor trail ────────────────────────────────────────────────────
+// ── Custom GPU-Accelerated Cursor Trail ────────────────────────────────────
 function CursorTrail() {
-  const dotsRef = useRef([]);
   const mouseRef = useRef({ x: -200, y: -200 });
   const rafRef = useRef(null);
   const containerRef = useRef(null);
@@ -28,10 +27,11 @@ function CursorTrail() {
     const container = containerRef.current;
     if (!container) return;
     const dots = Array.from(container.children);
-    dotsRef.current = dots.map((el, i) => ({ el, x: -200, y: -200, delay: i }));
 
-    const onMove = e => { mouseRef.current = { x: e.clientX, y: e.clientY }; };
-    window.addEventListener("mousemove", onMove);
+    const onMove = e => { 
+      mouseRef.current = { x: e.clientX, y: e.clientY }; 
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
 
     let positions = Array(COUNT).fill(null).map(() => ({ x: -200, y: -200 }));
 
@@ -43,28 +43,38 @@ function CursorTrail() {
           y: positions[i].y + (positions[i-1].y - positions[i].y) * 0.28,
         };
       }
+      
       dots.forEach((dot, i) => {
         const progress = 1 - i / COUNT;
-        const size = 6 * progress;
-        dot.style.left = positions[i].x - size/2 + "px";
-        dot.style.top  = positions[i].y - size/2 + "px";
-        dot.style.width  = size + "px";
-        dot.style.height = size + "px";
+        const baseSize = 6;
+        
+        // Uses hardware-accelerated transforms rather than triggering layout redraws via top/left
+        dot.style.transform = `translate3d(${positions[i].x - baseSize / 2}px, ${positions[i].y - baseSize / 2}px, 0) scale(${progress})`;
         dot.style.opacity = progress * 0.7;
       });
       rafRef.current = requestAnimationFrame(animate);
     }
     animate();
-    return () => { window.removeEventListener("mousemove", onMove); cancelAnimationFrame(rafRef.current); };
+    
+    return () => { 
+      window.removeEventListener("mousemove", onMove); 
+      cancelAnimationFrame(rafRef.current); 
+    };
   }, []);
 
   return (
-    <div ref={containerRef} style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:9999 }}>
+    <div ref={containerRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999 }}>
       {Array(COUNT).fill(null).map((_, i) => (
         <div key={i} style={{
-          position:"fixed", borderRadius:"50%",
-          background:`radial-gradient(circle, ${C.accent}, ${C.accentAlt})`,
-          pointerEvents:"none", transition:"opacity 0.1s",
+          position: "absolute", 
+          top: 0, 
+          left: 0, 
+          width: "6px", 
+          height: "6px", 
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${C.accent}, ${C.accentAlt})`,
+          pointerEvents: "none",
+          willChange: "transform, opacity"
         }}/>
       ))}
     </div>
@@ -219,7 +229,7 @@ function CountUp({ target, suffix="", duration=1600 }) {
   return <span ref={ref}>{val}{suffix}</span>;
 }
 
-// ── Petal Canvas ──────────────────────────────────────────────────────────
+// ── Performance-Optimized Petal Canvas ────────────────────────────────────
 function PetalCanvas() {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -239,7 +249,8 @@ function PetalCanvas() {
     }
     function init() {
       W=canvas.width=canvas.offsetWidth; H=canvas.height=canvas.offsetHeight;
-      petals=Array.from({length:55},()=>({
+      // Trimmed downstream overhead down to 26 fluid nodes for smooth rendering profiles
+      petals=Array.from({length:26},()=>({
         x:Math.random()*W, y:Math.random()*H,
         vy:Math.random()*.55+.18, vx:(Math.random()-.5)*.32,
         rot:Math.random()*Math.PI*2, vrot:(Math.random()-.5)*.018,
@@ -304,7 +315,7 @@ function Glitter() {
   );
 }
 
-// ── Shared UI ─────────────────────────────────────────────────────────────
+// ── Shared UI Styles ──────────────────────────────────────────────────────
 const gs = {
   fontFamily: "'Inter', system-ui, sans-serif",
   color: C.primary,
@@ -337,6 +348,7 @@ function SectionLabel({children}) {
   );
 }
 
+// Re-anchored to responsive grid layout structures
 function SectionHeading({children}) {
   return <h2 style={{
     fontFamily:"'Space Grotesk',sans-serif",
@@ -358,7 +370,7 @@ function Card({children,style={},glowColor,onClick}) {
         border:`1px solid ${hov?gc+"60":C.border}`,
         borderRadius:18,padding:26,
         transition:"all 0.32s cubic-bezier(.4,0,.2,1)",
-        boxShadow:hov?`0 0 0 1px ${gc}20,0 12px 48px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05)`:"inset 0 1px 0 rgba(255,255,255,0.03)",
+        boxShadow:hov?`0 0 0 1px ${gc}20,0 12px 48px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.05)`:"none",
         transform:hov?"translateY(-5px) scale(1.015)":"none",
         cursor:onClick?"pointer":"default",
         textAlign:"left",
@@ -455,8 +467,9 @@ function Nav() {
         borderBottom:`1px solid ${scrolled?C.border:"transparent"}`,
         transition:"all 0.4s cubic-bezier(.4,0,.2,1)",
       }}>
+        {/* Typographic Left Logo */}
         <div onClick={()=>go("home")} style={{
-          fontFamily:"'Space Grotesk',sans-serif",fontWeight:800,fontSize:20,
+          fontFamily:"'Space Grotesk', sans-serif",fontWeight:800,fontSize:20,
           letterSpacing:"-0.03em",cursor:"pointer",display:"flex",alignItems:"center",userSelect:"none"
         }}>
           <span style={{ color: "#FFFFFF" }}>K</span>
@@ -549,7 +562,7 @@ function Hero() {
       <MorphBlob color={C.accent} size={350} style={{top:"55%",right:"-5%",animationDelay:"3s"}}/>
       <MorphBlob color="#C084D4" size={250} style={{bottom:"10%",left:"30%",animationDelay:"1.5s"}}/>
 
-      {/* PC Layout Constraint Wrapper */}
+      {/* PC Ultra-Wide structural layout alignment alignment restraint */}
       <div style={{position:"relative",zIndex:1,maxWidth:1200,margin:"0 auto",width:"100%",textAlign:"left"}}>
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:32,...fadeIn(100)}}>
           {chips.map((c,i)=>(
@@ -566,7 +579,7 @@ function Hero() {
         <div style={fadeIn(350)}>
           <h1 style={{
             fontFamily:"'Space Grotesk',sans-serif",
-            fontSize:"clamp(52px,8.5vw,96px)",
+            fontSize:"clamp(44px,7.5vw,88px)",
             fontWeight:700,color:C.primary,
             margin:"0 0 4px 0",lineHeight:.92,letterSpacing:"-0.025em",
           }}>
@@ -654,7 +667,8 @@ function About() {
     {icon:"🔬",label:"Machine Learning",desc:"Scikit-learn, TensorFlow, deep learning pipelines"},
     {icon:"👁",label:"Computer Vision",desc:"OpenCV, MediaPipe, FaceNet, pose estimation"},
     {icon:"🤖",label:"AI Automation",desc:"n8n workflows, chatbots, intelligent pipelines"},
-    {icon:"🔍",label:"Explainable AI",desc:"SHAP, feature attribution, model interpretability"},];
+    {icon:"🔍",label:"Explainable AI",desc:"SHAP, feature attribution, model interpretability"},
+  ];
   return (
     <section id="about" style={{padding:"120px clamp(20px,8vw,120px)",borderTop:`1px solid ${C.border}`,overflow:"hidden",position:"relative"}}>
       <MorphBlob color={C.accent} size={400} style={{top:"-10%",right:"-5%",animationDelay:"2s"}}/>
@@ -753,7 +767,7 @@ function Skills() {
                   background:`linear-gradient(90deg,${C.accent},${C.accentAlt})`,
                   WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",
                   marginBottom:16,letterSpacing:"0.1em",textTransform:"uppercase",
-                }} TYPE_UNSPECIFIED>{s.category}</h3>
+                }}>{s.category}</h3>
                 <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
                   {s.items.map((item,ii)=><SkillPill key={item} label={item} delay={si*50+ii*35}/>)}
                 </div>
@@ -801,6 +815,9 @@ function ProjectCard({p,index}) {
           background:C.surface,
           border:`1px solid ${hov?p.color+"60":C.border}`,
           borderRadius:22,padding:"36px 40px",
+          display:"flex",
+          flexDirection:"column",
+          gap:20,
           transition:"all 0.38s cubic-bezier(.4,0,.2,1)",
           boxShadow:hov?`0 0 0 1px ${p.color}18,0 24px 64px rgba(0,0,0,0.65),inset 0 1px 0 rgba(255,255,255,0.05)`:"inset 0 1px 0 rgba(255,255,255,0.03)",
           transform:hov?"translateY(-8px)":"none",
@@ -961,12 +978,14 @@ function Research() {
                 <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap",justifyContent:"flex-start"}}>
                   <Tag>Under Review</Tag><Tag color={C.success}>IEEE Journal</Tag>
                 </div>
+                {/* Repositioned text outside of JSX container expression constraints */}
                 <h3 style={{
                   fontFamily:"'Space Grotesk',sans-serif",
                   fontSize:"clamp(17px,2.2vw,22px)",fontWeight:700,color:C.primary,
                   margin:"0 0 12px 0",lineHeight:1.4,
                 }}>
-                  An Explainable AI Framework for Breast Cancer Prediction Using Machine Learning Models and Feature Attribution Methods</h3>
+                  An Explainable AI Framework for Breast Cancer Prediction Using Machine Learning Models and Feature Attribution Methods
+                </h3>
                 <p style={{color:C.secondary,fontSize:14,marginBottom:18,fontFamily:"'Inter',sans-serif"}}>
                   Submitted to <strong style={{color:C.primary}}>IEEE Journal of Biomedical and Health Informatics</strong>
                 </p>
@@ -1007,7 +1026,7 @@ function Experience() {
               <div style={{marginTop:36}}>
                 <Card style={{padding:"28px 32px"}}>
                   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:18,flexWrap:"wrap",gap:10}}>
-                    <div style={{textAlign: "left"}}>
+                    <div style={{textAlign:"left"}}>
                       <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:17,fontWeight:700,color:C.primary,marginBottom:4}}>
                         AI Automation Intern
                       </div>
@@ -1109,8 +1128,7 @@ function Contact() {
         </Reveal>
         <Reveal delay={200}>
           <p style={{color:C.secondary,fontSize:15,lineHeight:1.88,marginTop:20,marginBottom:48,fontFamily:"'Inter',sans-serif",maxWidth:680}}>
-            Open to AI/ML engineering roles, research collaborations, and freelance
-            AI projects. If you're building something ambitious with AI, I'd love to hear about it.
+            Open to AI/ML engineering roles, research collaborations, and freelance AI projects. If you're building something ambitious with AI, I'd love to hear about it.
           </p>
         </Reveal>
         <Reveal delay={300}>
@@ -1141,7 +1159,7 @@ function Footer() {
   );
 }
 
-// ── App ───────────────────────────────────────────────────────────────────
+// ── App Configuration Entry ─────────────────────────────────────────────────
 export default function App() {
   return (
     <>
@@ -1149,12 +1167,11 @@ export default function App() {
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
         html{scroll-behavior:smooth;}
-        body{background:#0D0812;color:#FAF0F5;cursor:none;}
+        body{background:#0D0812;color:#FAF0F5;}
         ::selection{background:rgba(232,160,191,0.28);}
         ::-webkit-scrollbar{width:4px;}
         ::-webkit-scrollbar-track{background:#0D0812;}
         ::-webkit-scrollbar-thumb{background:linear-gradient(${C.accent},${C.accentAlt});border-radius:2px;}
-        button,a{cursor:none;}
 
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
         @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
@@ -1176,6 +1193,7 @@ export default function App() {
         @keyframes letterBounce{0%{opacity:0;transform:translateY(20px) scale(0.8)}60%{transform:translateY(-5px) scale(1.05)}100%{opacity:1;transform:none}}
         @keyframes navDot{from{width:0;opacity:0}to{width:16px;opacity:1}}
         @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:0.5}}
+        @keyframes strokePulse{0%,100%{stroke-width:2.5px;opacity:1}50%{stroke-width:4px;opacity:0.6}}
         @keyframes statGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3) drop-shadow(0 0 8px currentColor)}}
 
         @media(max-width:768px){.nav-desktop{display:none!important}.nav-burger{display:block!important}}
