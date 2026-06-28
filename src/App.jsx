@@ -576,7 +576,7 @@ function Hero() {
             fontWeight:700,color:C.primary,
             margin:"0 0 4px 0",lineHeight:.92,letterSpacing:"-0.025em",
           }}>
-            {"Konain".split("").map((ch,i)=>(
+            {"Konain Fatima".split("").map((ch,i)=>(
               <span key={i} style={{
                 display:"inline-block",
                 animation:`letterBounce 0.5s cubic-bezier(.34,1.56,.64,1) ${500+i*60}ms both`,
