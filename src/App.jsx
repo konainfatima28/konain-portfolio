@@ -92,12 +92,18 @@ function RippleLayer() {
     <div style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:9998 }}>
       {ripples.map(r => (
         <div key={r.id} style={{
-          position:"fixed", left: r.x, top: r.y,
-          width:0, height:0,
+          position:"fixed", 
+          left: r.x, 
+          top: r.y,
+          width:"100px", 
+          height:"100px",
           borderRadius:"50%",
           border:`1.5px solid ${C.accent}`,
-          transform:"translate(-50%,-50%)",
-          animation:"rippleOut 0.8s ease-out forwards",
+          pointerEvents:"none",
+          willChange: "transform, opacity",
+          // Anchor the center so the transform scales outward perfectly from the click point
+          margin: "-50px 0 0 -50px", 
+          animation:"rippleOut 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards",
         }}/>
       ))}
     </div>
@@ -654,8 +660,7 @@ function About() {
     {icon:"🔬",label:"Machine Learning",desc:"Scikit-learn, TensorFlow, deep learning pipelines"},
     {icon:"👁",label:"Computer Vision",desc:"OpenCV, MediaPipe, FaceNet, pose estimation"},
     {icon:"🤖",label:"AI Automation",desc:"n8n workflows, chatbots, intelligent pipelines"},
-    {icon:"🔍",label:"Explainable AI",desc:"SHAP, feature attribution, model interpretability"},
-  ];
+    {icon:"🔍",label:"Explainable AI",desc:"SHAP, feature attribution, model interpretability"},];
   return (
     <section id="about" style={{padding:"120px clamp(20px,8vw,120px)",borderTop:`1px solid ${C.border}`,overflow:"hidden",position:"relative"}}>
       <MorphBlob color={C.accent} size={400} style={{top:"-10%",right:"-5%",animationDelay:"2s"}}/>
@@ -966,7 +971,8 @@ function Research() {
                   fontFamily:"'Space Grotesk',sans-serif",
                   fontSize:"clamp(17px,2.2vw,22px)",fontWeight:700,color:C.primary,
                   margin:"0 0 12px 0",lineHeight:1.4,
-                }}>{An Explainable AI Framework for Breast Cancer Prediction Using Machine Learning Models and Feature Attribution Methods}</h3>
+                }}>
+                  An Explainable AI Framework for Breast Cancer Prediction Using Machine Learning Models and Feature Attribution Methods</h3>
                 <p style={{color:C.secondary,fontSize:14,marginBottom:18,fontFamily:"'Inter',sans-serif"}}>
                   Submitted to <strong style={{color:C.primary}}>IEEE Journal of Biomedical and Health Informatics</strong>
                 </p>
